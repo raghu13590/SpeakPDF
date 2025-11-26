@@ -1,15 +1,13 @@
 import fitz  # PyMuPDF
-from io import BytesIO
 
 def extract_text_with_coordinates(data: bytes):
     """
     Extracts text and character coordinates from PDF bytes using PyMuPDF's rawdict.
     
-    IMPROVEMENTS:
-    - Uses `rawdict` for exact character bounding boxes (pixel-perfect highlighting).
-    - Calculates median font size to identify headings.
-    - Forces double newlines after headings to prevent sentence clubbing.
+    Features:
+    - Uses `rawdict` for exact character bounding boxes.
     - Filters tables, headers/footers, and images.
+    - Enforces double newlines for block separation.
     
     Returns:
         full_text (str): The complete text of the PDF.
@@ -39,7 +37,7 @@ def extract_text_with_coordinates(data: bytes):
         header_height = page_height * 0.05
         footer_y = page_height * 0.95
         
-    # 4. Get Text with rawdict (provides individual characters)
+        # 4. Get Text with rawdict (provides individual characters)
         # flags=fitz.TEXT_PRESERVE_LIGATURES | fitz.TEXT_PRESERVE_WHITESPACE
         text_page = page.get_text("rawdict", flags=fitz.TEXT_PRESERVE_LIGATURES | fitz.TEXT_PRESERVE_WHITESPACE)
         blocks = text_page.get("blocks", [])
@@ -154,14 +152,3 @@ def extract_text_with_coordinates(data: bytes):
     
     doc.close()
     return full_text, char_map
-
-def pdf_bytes_to_text(data: bytes) -> str:
-    """
-    Simple text extraction from PDF bytes.
-    """
-    doc = fitz.open(stream=data, filetype="pdf")
-    text = ""
-    for page in doc:
-        text += page.get_text()
-    doc.close()
-    return text.strip()

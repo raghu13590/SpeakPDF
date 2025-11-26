@@ -3,7 +3,7 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from .pdf_parser import pdf_bytes_to_text, extract_text_with_coordinates
+from .pdf_parser import extract_text_with_coordinates
 from .nlp import split_into_sentences
 from .tts import tts_sentence_to_wav
 
