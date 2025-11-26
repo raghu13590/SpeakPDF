@@ -18,13 +18,13 @@ export default function Home() {
   return (
     <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       <Container sx={{ py: 2 }}>
-        <Typography variant="h4" gutterBottom>
-          PDF to Speech
-        </Typography>
         <Stack direction="row" spacing={2} alignItems="center">
+          <Typography variant="h4" gutterBottom>
+            PDF to Speech
+          </Typography>
           <PdfUploader onUploaded={(data) => {
             setSentences(data.sentences);
-            setPdfUrl(data.pdfUrl);
+            setPdfUrl(`${data.pdfUrl}?t=${Date.now()}`);
           }} />
           <Button
             variant="outlined"

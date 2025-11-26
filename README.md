@@ -1,4 +1,4 @@
-# PDF to Speech Reader
+# PDF to Speech
 
 A full-stack application that converts PDF documents into natural-sounding speech using AI-powered text-to-speech (TTS) technology. Upload a PDF, and listen to it read aloud with professional voice synthesis powered by Supertonic.
 

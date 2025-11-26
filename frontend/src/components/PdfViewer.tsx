@@ -73,13 +73,9 @@ export default function PdfViewer({ pdfUrl, sentences, currentId, onJump, autoSc
             if (pageBBoxes.length === 0) return null;
 
             return (
+
                 <div
                     key={sentence.id}
-                    ref={el => {
-                        if (sentence.id === currentId) {
-                            sentenceRefs.current[sentence.id] = el;
-                        }
-                    }}
                     style={{
                         position: 'absolute',
                         top: 0,
@@ -92,6 +88,12 @@ export default function PdfViewer({ pdfUrl, sentences, currentId, onJump, autoSc
                     {pageBBoxes.map((bbox, idx) => (
                         <div
                             key={idx}
+                            ref={el => {
+                                // Attach ref to the first bbox of the active sentence on this page
+                                if (sentence.id === currentId && idx === 0) {
+                                    sentenceRefs.current[sentence.id] = el;
+                                }
+                            }}
                             style={{
                                 position: 'absolute',
                                 left: `${(bbox.x / bbox.page_width) * 100}%`,

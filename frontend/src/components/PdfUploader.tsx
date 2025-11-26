@@ -5,16 +5,25 @@ type Props = { onUploaded: (data: { sentences: any[]; pdfUrl: string }) => void 
 
 export default function PdfUploader({ onUploaded }: Props) {
   const inputId = "pdf-upload-input";
+  const [isUploading, setIsUploading] = React.useState(false);
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const form = new FormData();
-    form.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: form });
-    const data = await res.json();
-    onUploaded(data);
-    e.target.value = ""; // reset
+
+    setIsUploading(true);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: form });
+      const data = await res.json();
+      onUploaded(data);
+    } catch (error) {
+      console.error("Upload failed", error);
+    } finally {
+      setIsUploading(false);
+      e.target.value = ""; // reset
+    }
   };
 
   return (
@@ -27,8 +36,8 @@ export default function PdfUploader({ onUploaded }: Props) {
         style={{ display: "none" }}
       />
       <label htmlFor={inputId}>
-        <Button variant="contained" component="span">
-          Upload PDF
+        <Button variant="contained" component="span" disabled={isUploading}>
+          {isUploading ? "Uploading..." : "Upload PDF"}
         </Button>
       </label>
     </>
