@@ -35,6 +35,11 @@ export default function PlayerControls({ sentences, currentId, onCurrentChange, 
     }
   }, [selectedVoice]);
 
+  // Stop playback when sentences changes (new PDF uploaded)
+  useEffect(() => {
+    stop();
+  }, [sentences]);
+
   async function playSentence(id: number) {
     const audio = audioRef.current;
     if (!audio) return;

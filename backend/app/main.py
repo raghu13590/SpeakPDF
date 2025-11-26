@@ -1,4 +1,5 @@
 import os
+import uuid
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -26,8 +27,10 @@ async def upload_pdf(file: UploadFile = File(...)):
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Please upload a PDF file.")
     
-    # TODO: Use unique IDs per upload instead of overwriting
-    pdf_path = os.path.join("/static", "uploaded.pdf")
+    # Generate unique ID for this upload
+    upload_id = str(uuid.uuid4())
+    pdf_filename = f"{upload_id}.pdf"
+    pdf_path = os.path.join("/static", pdf_filename)
     os.makedirs("/static", exist_ok=True)
     
     content = await file.read()
@@ -101,7 +104,7 @@ async def upload_pdf(file: UploadFile = File(...)):
             
         enriched_sentences.append(s)
 
-    return {"sentences": enriched_sentences, "pdfUrl": "/uploaded.pdf"}
+    return {"sentences": enriched_sentences, "pdfUrl": f"/{pdf_filename}"}
 
 @app.get(f"{API_PREFIX}/voices")
 async def get_voices():

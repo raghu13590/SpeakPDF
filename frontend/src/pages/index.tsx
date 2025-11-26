@@ -25,6 +25,8 @@ export default function Home() {
           <PdfUploader onUploaded={(data) => {
             setSentences(data.sentences);
             setPdfUrl(`${data.pdfUrl}?t=${Date.now()}`);
+            setCurrentId(null);
+            setPlayRequestId(null);
           }} />
           <Button
             variant="outlined"
