@@ -45,14 +45,65 @@ async def upload_pdf(file: UploadFile = File(...)):
     for s in sentences:
         s_text = s["text"]
         
-        start = text.find(s_text, current_idx)
-        if start != -1:
-            end = start + len(s_text)
-            bboxes = char_map[start:end]
-            s["bboxes"] = bboxes
-            current_idx = end
-        else:
+        # 1. Create a "clean" version of the sentence for matching (no whitespace)
+        s_text_clean = "".join(s_text.split())
+        
+        if not s_text_clean:
             s["bboxes"] = []
+            enriched_sentences.append(s)
+            continue
+            
+        # 2. Scan 'text' starting from current_idx to find the sequence of chars in s_text_clean
+        match_start = -1
+        match_end = -1
+        s_ptr = 0
+        
+        temp_idx = current_idx
+        
+        # Search for the sentence in the text
+        while temp_idx < len(text) and s_ptr < len(s_text_clean):
+            char = text[temp_idx]
+            
+            # Skip whitespace in the source text
+            if char.isspace():
+                temp_idx += 1
+                continue
+                
+            # Check for match
+            if char == s_text_clean[s_ptr]:
+                if match_start == -1:
+                    match_start = temp_idx
+                s_ptr += 1
+                temp_idx += 1
+            else:
+                # Mismatch
+                if match_start != -1:
+                    # We were matching but failed. Reset and try again from next char.
+                    # This handles cases where the same word appears multiple times.
+                    temp_idx = match_start + 1
+                    match_start = -1
+                    s_ptr = 0
+                else:
+                    # Haven't found start yet, keep looking
+                    temp_idx += 1
+        
+        # Check if we found the full sentence
+        if match_start != -1 and s_ptr == len(s_text_clean):
+            match_end = temp_idx
+            # Extract bboxes for the matched range
+            bboxes = char_map[match_start:match_end]
+            s["bboxes"] = bboxes
+            current_idx = match_end
+        else:
+            # Fallback: if strict match fails, try simple find (legacy behavior)
+            # This might happen if punctuation differs slightly
+            start = text.find(s_text, current_idx)
+            if start != -1:
+                end = start + len(s_text)
+                s["bboxes"] = char_map[start:end]
+                current_idx = end
+            else:
+                s["bboxes"] = []
             
         enriched_sentences.append(s)
 
